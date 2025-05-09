@@ -7,22 +7,28 @@ async function loadMovies() {
         const response = await fetch('data/movies.json');  // 从 data 文件夹中的 movies.json 文件加载数据
         const data = await response.json();
         
-        // 格式化电影数据
-        const formattedMovies = data.map(movie => ({
-            id: movie.id,
-            title: movie.original_title,  // 使用英文原名
-            poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`, // 构建海报的完整URL
-            rating: movie.vote_average,  // 评分
-            year: movie.release_date.split('-')[0],  // 获取年份
-            genre: movie.genres.map(g => g.name),  // 提取所有类别
-            country: movie.production_countries.map(c => c.name).join(', '),  // 电影制作国家
-        }));
+        console.log(data);  // 输出 data，检查它的类型
 
-        // 将转换后的数据推入 movies 数组
-        movies.push(...formattedMovies);
-        
-        updateFilters();  // 更新筛选条件
-        displayMovies(movies);  // 显示电影
+        if (Array.isArray(data)) {
+            // 格式化电影数据
+            const formattedMovies = data.map(movie => ({
+                id: movie.id,
+                title: movie.original_title,  // 使用英文原名
+                poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`, // 构建海报的完整URL
+                rating: movie.vote_average,  // 评分
+                year: movie.release_date.split('-')[0],  // 获取年份
+                genre: movie.genres.map(g => g.name),  // 提取所有类别
+                country: movie.production_countries.map(c => c.name).join(', '),  // 电影制作国家
+            }));
+
+            // 将转换后的数据推入 movies 数组
+            movies.push(...formattedMovies);
+
+            updateFilters();  // 更新筛选条件
+            displayMovies(movies);  // 显示电影
+        } else {
+            console.error("电影数据不是一个数组，无法格式化");
+        }
     } catch (error) {
         console.error('加载电影数据失败:', error);
     }
