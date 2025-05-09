@@ -11,14 +11,14 @@ async function loadMovies() {
 
         if (Array.isArray(data)) {
             // 格式化电影数据
-            const formattedMovies = data.map(movie => ({
-                id: movie.id,
-                title: movie.original_title,  // 使用英文原名
-                poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`, // 构建海报的完整URL
-                rating: movie.vote_average,  // 评分
-                year: movie.release_date.split('-')[0],  // 获取年份
-                genre: movie.genres.map(g => g.name),  // 提取所有类别
-                country: movie.production_countries.map(c => c.name).join(', '),  // 电影制作国家
+            const formattedMovies = data.results.map(movie => ({
+				id: movie.id,
+				title: movie.original_title,
+				poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+				rating: movie.vote_average,
+				year: movie.release_date.split('-')[0],
+				genre: movie.genres.map(g => g.name),
+				country: movie.production_countries.map(c => c.name).join(', '),
             }));
 
             // 将转换后的数据推入 movies 数组
