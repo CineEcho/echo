@@ -2,7 +2,7 @@ name: Fetch Movie Data
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天 00:00 UTC 执行一次任务
+    - cron: '0 0 * * *'
   push:
     branches:
       - main
@@ -13,29 +13,32 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # 禁用默认的 GitHub Actions 身份验证
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18'
 
       - name: Install dependencies
         run: |
-          npm install axios
-          npm install dotenv  # 安装 dotenv 模块
+          npm install axios dotenv
 
       - name: Run the movie fetch script
         env:
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}  # 使用 GitHub Secrets 中的 API 密钥
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: |
           node scripts/fetch-movies.js
 
       - name: Commit and push the updated movie data
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/CineEcho/echo.git  # 使用 PAT 进行身份验证
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/CineEcho/echo.git
           git add data/movies.json
           git commit -m "Update movie data"
-          git push
+          git push origin main
